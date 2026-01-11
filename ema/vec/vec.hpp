@@ -2,22 +2,41 @@
 
 #include <cstddef> // for: size_t
 
-#include "../concepts/scalar.hpp"
+#include "ema/concepts/types/scalar.hpp"
 
 namespace ema {
 
-template <concepts::Scalar T, size_t N> requires(N > 0 && N <= 4)
+template <types::Scalar T, size_t N> requires(N > 0 && N <= 4)
 class alignas(sizeof(T) * (N == 3 ? 4 : N)) Vec {
-  public: // member-fields:
+  private: // member-fields:
     T components[N == 3 ? 4 : N];
 
   public: // member-functions:
     // default constructor:
     constexpr Vec() : components{T(0)} {}
 
-    constexpr static Vec<T, N> AdditionIdentity() {
+    constexpr Vec(T num) {
+        for (int i = 0; i < N; ++i) {
+            components[i] = num;
+        }
+    }
+
+    // Addition Identity Matrix:
+    constexpr static Vec<T, N> Identity() {
         Vec<T, N> identity;
         return identity;
+    }
+
+    constexpr static Vec<T, N> Unit(size_t axis = 0) {
+        Vec<T, N> unit;
+        unit[axis % N] = 1;
+        return unit;
+    }
+
+    // whole lotta syntax sugar but it is math:
+    constexpr static Vec<T, N> Zero() {
+        Vec<T, N> zero;
+        return zero;
     }
 
     // basic general constructor:
@@ -26,12 +45,22 @@ class alignas(sizeof(T) * (N == 3 ? 4 : N)) Vec {
         static_assert(sizeof...(Args) == N, "Vec: invalid number of arguments");
     }
 
+    constexpr size_t dimension() const { return N; }
+
     // clang-format off
     constexpr       T* begin()       noexcept { return components; }
     constexpr const T* begin() const noexcept { return components; }
     constexpr       T* end()         noexcept { return components + N; }
     constexpr const T* end()   const noexcept { return components + N; }
     // clang-format on
+
+    Vec operator-() const {
+        Vec<T, N> result;
+        for (size_t i = 0; i < N; ++i) {
+            result.components[i] = -components[i];
+        }
+        return result;
+    }
 
     Vec& operator+=(const Vec& other) {
         for (size_t i = 0; i < N; ++i) {
@@ -77,31 +106,31 @@ class alignas(sizeof(T) * (N == 3 ? 4 : N)) Vec {
 };
 
 // free binary and unary operators:
-template <concepts::Scalar T, size_t N>
+template <types::Scalar T, size_t N>
 constexpr Vec<T, N> operator+(Vec<T, N> lhs, const Vec<T, N>& rhs) {
     lhs += rhs;
     return lhs;
 }
 
 // free binary operators:
-template <concepts::Scalar T, size_t N>
+template <types::Scalar T, size_t N>
 constexpr Vec<T, N> operator-(Vec<T, N> lhs, const Vec<T, N>& rhs) {
     lhs -= rhs;
     return lhs;
 }
 
-template <concepts::Scalar T, size_t N>
+template <types::Scalar T, size_t N>
 constexpr Vec<T, N> operator*(Vec<T, N> vec, T scalar) {
     vec *= scalar;
     return vec;
 }
 
-template <concepts::Scalar T, size_t N>
+template <types::Scalar T, size_t N>
 constexpr Vec<T, N> operator*(T scalar, Vec<T, N> vec) {
     return vec * scalar;
 }
 
-template <concepts::Scalar T, size_t N>
+template <types::Scalar T, size_t N>
 constexpr Vec<T, N> operator/(Vec<T, N> lhs, T scalar) {
     lhs /= scalar;
     return lhs;
@@ -119,3 +148,5 @@ using Vec3d = Vec<double, 3>;
 using Vec4d = Vec<double, 4>;
 
 } // namespace ema
+
+#include "func.hpp"

@@ -3,7 +3,7 @@
 #include <concepts>
 #include <type_traits>
 
-namespace ema::concepts {
+namespace ema::types {
 
 template <typename T>
 concept Scalar =
@@ -15,4 +15,4 @@ concept Scalar =
     !std::same_as<T, wchar_t> &&
     std::is_trivially_copyable_v<T>;
 
-} // namespace ema::concepts
+} // namespace ema::types
