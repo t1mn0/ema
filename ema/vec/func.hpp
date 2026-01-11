@@ -8,7 +8,13 @@
 namespace ema {
 
 template <types::Scalar T, size_t N>
-constexpr T length(const Vec<T, N>& vec) {
+constexpr T is_zero(const Vec<T, N>& vec) {
+    return len(vec) == T(0);
+}
+
+template <types::Scalar T, size_t N>
+constexpr T len(const Vec<T, N>& vec) {
+    // type(sum): if (T == float) => float; else double;
     std::conditional<std::is_same_v<T, float>, float, double> sum = 0.0;
     for (size_t i = 0; i < N; ++i) {
         sum += vec[i] * vec[i];
@@ -17,8 +23,8 @@ constexpr T length(const Vec<T, N>& vec) {
 }
 
 template <types::Scalar T, size_t N>
-constexpr T length_squared(const Vec<T, N>& vec) {
-    T sum = 0.0;
+constexpr T len_squared(const Vec<T, N>& vec) {
+    T sum = T(0);
     for (size_t i = 0; i < N; ++i) {
         sum += vec[i] * vec[i];
     }
@@ -26,56 +32,47 @@ constexpr T length_squared(const Vec<T, N>& vec) {
 }
 
 template <types::Scalar T, size_t N>
-bool is_identity(const Vec<T, N>& vec, T epsilon = std::numeric_limits<T>::epsilon()) {
-    if constexpr (std::floating_point<T>) {
-        return length_squared(vec) <= epsilon * epsilon;
-    } else {
-        return length_squared(vec) == T(0);
-    }
-}
-
-template <types::Scalar T, size_t N>
 constexpr Vec<T, N> normalize(const Vec<T, N>& vec) {
-    auto len = length(vec);
-    assert(len != 0, "Length of the vector for normalization must be positive");
+    auto l = len(vec);
+    assert(l != 0, "Length of the vector for normalization must be not zero");
 
-    Vec<T, N> result;
+    Vec<T, N> norm;
     for (size_t i = 0; i < N; ++i) {
-        result[i] = vec[i] * (T(1) / len);
+        norm[i] = vec[i] * (T(1) / len);
     }
-    return result;
+    return norm;
 }
 
 template <types::Scalar T, size_t N>
-constexpr Vec<T, N> dot(const Vec<T, N>& a, const Vec<T, N>& b) {
-    T result = T(0);
+constexpr T dot(const Vec<T, N>& a, const Vec<T, N>& b) {
+    T sum = T(0);
     for (size_t i = 0; i < N; ++i) {
-        result += a[i] * b[i];
+        sum += a[i] * b[i];
     }
-    return result;
+    return sum;
+}
+
+template <types::Scalar T, size_t N>
+constexpr T distance(const Vec<T, N>& a, const Vec<T, N>& b) {
+    return len(a - b);
+}
+
+template <types::Scalar T, size_t N>
+constexpr T distance_squared(const Vec<T, N>& a, const Vec<T, N>& b) {
+    return len_squared(a - b);
 }
 
 template <types::Scalar T>
-constexpr Vec<T, 3> cross(const Vec<T, 3>& a, const Vec<T, 3>& b) {
+constexpr Vec<T, 3> cross_product(const Vec<T, 3>& a, const Vec<T, 3>& b) {
     return Vec<T, 3>{
         a.y() * b.z() - a.z() * b.y(),
         a.z() * b.x() - a.x() * b.z(),
         a.x() * b.y() - a.y() * b.x()};
 }
 
-template <types::Scalar T, size_t N>
-constexpr auto distance(const Vec<T, N>& a, const Vec<T, N>& b) {
-    return length(a - b);
-}
-
-template <types::Scalar T, size_t N>
-constexpr auto distance_squared(const Vec<T, N>& a, const Vec<T, N>& b) {
-    return length_squared(a - b);
-}
-
 template <types::Scalar T>
-constexpr auto triple(const Vec<T, 3>& a, const Vec<T, 3>& b, const Vec<T, 3>& c) {
-    return dot(a, cross(b, c)); // [a, b, c] = a · (b × c)
+constexpr auto triple_product(const Vec<T, 3>& a, const Vec<T, 3>& b, const Vec<T, 3>& c) {
+    return dot(a, cross_product(b, c)); // [a, b, c] = a · (b × c)
 }
 
 template <types::Scalar T, size_t N>
@@ -86,12 +83,12 @@ constexpr auto reflect(const Vec<T, N>& incident, const Vec<T, N>& normal) {
 template <types::Scalar T, size_t N>
 constexpr auto project(const Vec<T, N>& a, const Vec<T, N>& b) {
     // project(a to b): (a · b / |b|²) * b
-    if (is_identity(b)) {
+    if (is_zero(b)) { // invalid argument case ([MAYBE_TODO]: handle this scenario more strictly)
         return Vec<T, N>{};
     }
 
-    auto b_squared_length = length_squared(b);
-    return b * (dot(a, b) / b_squared_length);
+    auto b_squared_len = len_squared(b);
+    return b * (dot(a, b) / b_squared_len);
 }
 
 template <types::Scalar T, size_t N>
@@ -109,9 +106,9 @@ constexpr auto lerp(const Vec<T, N>& a, const Vec<T, N>& b, T t) {
 }
 
 template <types::Scalar T, size_t N>
-constexpr auto clamp_length(const Vec<T, N>& vec, T max_len) {
-    auto len = length(vec);
-    if (len <= max_len) {
+constexpr auto clamp_len(const Vec<T, N>& vec, T max_len) {
+    auto l = len(vec);
+    if (l <= max_len) {
         return vec;
     }
     return normalize(vec) * max_len;
@@ -129,8 +126,8 @@ constexpr auto abs(const Vec<T, N>& vec) {
 template <types::Scalar T, size_t N>
 constexpr auto angle(const Vec<T, N>& a, const Vec<T, N>& b) {
     auto dot_product = dot(a, b);
-    auto len_a = length(a);
-    auto len_b = length(b);
+    auto len_a = len(a);
+    auto len_b = len(b);
 
     if (len_a == T(0) || len_b == T(0))
         return T(0);
