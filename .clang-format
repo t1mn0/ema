@@ -1,0 +1,37 @@
+# .clang-format
+BasedOnStyle: LLVM
+Language: Cpp
+
+PointerAlignment: Left
+
+AlwaysBreakAfterReturnType: None
+AllowShortFunctionsOnASingleLine: All
+BreakBeforeConceptDeclarations: false
+
+AlwaysBreakAfterDefinitionReturnType: None
+PenaltyBreakBeforeFirstCallParameter: 10000
+PenaltyBreakOpenParenthesis: 0
+PenaltyBreakTemplateDeclaration: 10000
+
+BreakBeforeBraces: Attach
+BraceWrapping:
+  AfterFunction: false
+  AfterClass: false
+  AfterStruct: false
+  AfterUnion: false
+  AfterNamespace: false
+  AfterControlStatement: false
+  AfterEnum: false
+  AfterCaseLabel: false
+  BeforeElse: true
+  BeforeCatch: true
+  BeforeWhile: true
+
+RequiresClausePosition: SingleLine
+
+IndentRequiresClause: false
+
+IndentWidth: 4
+ColumnLimit: 0
+
+SpaceBeforeParens: ControlStatements
