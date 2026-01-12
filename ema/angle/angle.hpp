@@ -10,21 +10,18 @@ namespace ema {
 // User can increase the accuracy of calculating angles if necessary:
 template <std::floating_point T = float>
 class Angle {
-  public:
-    T rad_val;
+  private: // member-fields:
+    T rad_val = 0.0;
 
-    constexpr Angle() : rad_val(0) {}
+  public: // // member-functions:
+    constexpr Angle() = default;
     explicit constexpr Angle(T r) : rad_val(r) {}
-
     static constexpr Angle rad(T r) { return Angle(r); }
     static constexpr Angle deg(T d) {
         return Angle(d * (std::numbers::pi_v<T> / T(180)));
     }
 
-    constexpr T as_deg() const {
-        return rad_val * (T(180) / std::numbers::pi_v<T>);
-    }
-
+    constexpr T as_deg() const { return rad_val * (T(180) / std::numbers::pi_v<T>); }
     constexpr T as_rad() const { return rad_val; }
 
     constexpr auto operator<=>(const Angle<T>&) const = default;

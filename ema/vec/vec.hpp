@@ -81,7 +81,7 @@ class alignas(sizeof(T) * (N == 3 ? 4 : N)) Vec {
     constexpr std::reverse_iterator<const T*> rend() const   noexcept { return std::reverse_iterator<const T*>(begin()); }
     // clang-format on
 
-    // component-by-component subtraction:
+    // component-by-component inversion:
     Vec operator-() const {
         Vec<T, N> result;
         for (size_t i = 0; i < N; ++i) {
@@ -91,17 +91,17 @@ class alignas(sizeof(T) * (N == 3 ? 4 : N)) Vec {
     }
 
     // component-by-component addition with assignment:
-    Vec& operator+=(const Vec& other) {
+    Vec& operator+=(const Vec& oth) {
         for (size_t i = 0; i < N; ++i) {
-            components[i] += other.components[i];
+            components[i] += oth.components[i];
         }
         return *this;
     }
 
-    // component-by-component addition with subtraction:
-    Vec& operator-=(const Vec& other) {
+    // component-by-component subtraction with assignment:
+    Vec& operator-=(const Vec& oth) {
         for (size_t i = 0; i < N; ++i) {
-            components[i] -= other.components[i];
+            components[i] -= oth.components[i];
         }
         return *this;
     }
