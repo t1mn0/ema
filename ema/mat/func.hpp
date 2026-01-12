@@ -17,38 +17,150 @@ constexpr Mat<T, C, R> operator-(const Mat<T, C, R>& mat) {
 }
 
 template <types::Scalar T, size_t C, size_t R>
-constexpr Mat<T, C, R> operator+(Mat<T, C, R> lhs, const Mat<T, C, R>& rhs) {
-    lhs += rhs;
-    return lhs;
+constexpr Mat<T, C, R> operator-(Mat<T, C, R>&& mat) {
+    Mat<T, C, R> result;
+    for (size_t i = 0; i < C; ++i) {
+        result.col(i) = -mat.col(i);
+    }
+    return result;
 }
 
 template <types::Scalar T, size_t C, size_t R>
-constexpr Mat<T, C, R> operator-(Mat<T, C, R> lhs, const Mat<T, C, R>& rhs) {
-    lhs -= rhs;
-    return lhs;
+constexpr Mat<T, C, R> operator+(const Mat<T, C, R>& lhs, const Mat<T, C, R>& rhs) {
+    auto result = lhs;
+    result += rhs;
+    return result;
 }
 
 template <types::Scalar T, size_t C, size_t R>
-constexpr Mat<T, C, R> operator*(Mat<T, C, R> mat, T scalar) {
-    mat *= scalar;
-    return mat;
+constexpr Mat<T, C, R> operator+(Mat<T, C, R>&& lhs, const Mat<T, C, R>& rhs) {
+    auto result = lhs;
+    result += rhs;
+    return result;
 }
 
 template <types::Scalar T, size_t C, size_t R>
-constexpr Mat<T, C, R> operator*(T scalar, Mat<T, C, R> mat) {
+constexpr Mat<T, C, R> operator+(const Mat<T, C, R>& lhs, Mat<T, C, R>&& rhs) {
+    auto result = lhs;
+    result += rhs;
+    return result;
+}
+
+template <types::Scalar T, size_t C, size_t R>
+constexpr Mat<T, C, R> operator+(Mat<T, C, R>&& lhs, Mat<T, C, R>&& rhs) {
+    auto result = lhs;
+    result += rhs;
+    return result;
+}
+
+template <types::Scalar T, size_t C, size_t R>
+constexpr Mat<T, C, R> operator-(const Mat<T, C, R>& lhs, const Mat<T, C, R>& rhs) {
+    auto result = lhs;
+    result -= rhs;
+    return result;
+}
+
+template <types::Scalar T, size_t C, size_t R>
+constexpr Mat<T, C, R> operator-(const Mat<T, C, R>& lhs, Mat<T, C, R>&& rhs) {
+    auto result = lhs;
+    result -= rhs;
+    return result;
+}
+
+template <types::Scalar T, size_t C, size_t R>
+constexpr Mat<T, C, R> operator-(Mat<T, C, R>&& lhs, const Mat<T, C, R>& rhs) {
+    auto result = lhs;
+    result -= rhs;
+    return result;
+}
+
+template <types::Scalar T, size_t C, size_t R>
+constexpr Mat<T, C, R> operator-(Mat<T, C, R>&& lhs, Mat<T, C, R>&& rhs) {
+    auto result = lhs;
+    result -= rhs;
+    return result;
+}
+
+template <types::Scalar T, size_t C, size_t R>
+constexpr Mat<T, C, R> operator*(const Mat<T, C, R>& mat, T scalar) {
+    auto result = mat;
+    result *= scalar;
+    return result;
+}
+
+template <types::Scalar T, size_t C, size_t R>
+constexpr Mat<T, C, R> operator*(Mat<T, C, R>&& mat, T scalar) {
+    auto result = mat;
+    result *= scalar;
+    return result;
+}
+
+template <types::Scalar T, size_t C, size_t R>
+constexpr Mat<T, C, R> operator*(T scalar, const Mat<T, C, R>& mat) {
     return mat * scalar;
 }
 
 template <types::Scalar T, size_t C, size_t R>
-constexpr Mat<T, C, R> operator/(Mat<T, C, R> mat, T scalar) {
+constexpr Mat<T, C, R> operator*(T scalar, Mat<T, C, R>&& mat) {
+    return mat * scalar;
+}
+
+template <types::Scalar T, size_t C, size_t R>
+constexpr Mat<T, C, R> operator/(const Mat<T, C, R>& mat, T scalar) {
+    auto result = mat;
     for (size_t i = 0; i < C; ++i) {
-        mat.col(i) /= scalar;
+        result.col(i) /= scalar;
     }
-    return mat;
+    return result;
+}
+
+template <types::Scalar T, size_t C, size_t R>
+constexpr Mat<T, C, R> operator/(Mat<T, C, R>&& mat, T scalar) {
+    auto result = mat;
+    for (size_t i = 0; i < C; ++i) {
+        result.col(i) /= scalar;
+    }
+    return result;
 }
 
 template <types::Scalar T, size_t C, size_t R>
 constexpr Vec<T, R> operator*(const Mat<T, C, R>& mat, const Vec<T, C>& vec) {
+    // Mat<R, C> * Vec<C> = Mat<R, C> * Mat<C,1> = Mat<R,1> = Vec<R>
+    Vec<T, R> result = Vec<T, R>::Zero();
+
+    for (size_t c = 0; c < C; ++c) {
+        result += mat.col(c) * vec[c];
+    }
+
+    return result;
+}
+
+template <types::Scalar T, size_t C, size_t R>
+constexpr Vec<T, R> operator*(Mat<T, C, R>&& mat, const Vec<T, C>& vec) {
+    // Mat<R, C> * Vec<C> = Mat<R, C> * Mat<C,1> = Mat<R,1> = Vec<R>
+    Vec<T, R> result = Vec<T, R>::Zero();
+
+    for (size_t c = 0; c < C; ++c) {
+        result += mat.col(c) * vec[c];
+    }
+
+    return result;
+}
+
+template <types::Scalar T, size_t C, size_t R>
+constexpr Vec<T, R> operator*(const Mat<T, C, R>& mat, Vec<T, C>&& vec) {
+    // Mat<R, C> * Vec<C> = Mat<R, C> * Mat<C,1> = Mat<R,1> = Vec<R>
+    Vec<T, R> result = Vec<T, R>::Zero();
+
+    for (size_t c = 0; c < C; ++c) {
+        result += mat.col(c) * vec[c];
+    }
+
+    return result;
+}
+
+template <types::Scalar T, size_t C, size_t R>
+constexpr Vec<T, R> operator*(Mat<T, C, R>&& mat, Vec<T, C>&& vec) {
     // Mat<R, C> * Vec<C> = Mat<R, C> * Mat<C,1> = Mat<R,1> = Vec<R>
     Vec<T, R> result = Vec<T, R>::Zero();
 
@@ -71,18 +183,43 @@ constexpr Vec<T, C> operator*(const Vec<T, R>& vec, const Mat<T, C, R>& mat) {
     return result;
 }
 
-// Linear algebra functions:
 template <types::Scalar T, size_t C, size_t R>
-constexpr Mat<T, R, C> transpose(const Mat<T, C, R>& mat) {
-    Mat<T, R, C> result;
+constexpr Vec<T, C> operator*(Vec<T, R>&& vec, const Mat<T, C, R>& mat) {
+    // Vec<R> * Mat<R, C> = Mat<1, R> * Mat<R, C> = Mat<1, C> = Vec<C>
+    Vec<T, C> result = Vec<T, C>::Zero();
+
     for (size_t r = 0; r < R; ++r) {
-        for (size_t c = 0; c < C; ++c) {
-            result(c, r) = mat(r, c);
-        }
+        result += mat.columns[r] * vec[r];
     }
+
     return result;
 }
 
+template <types::Scalar T, size_t C, size_t R>
+constexpr Vec<T, C> operator*(const Vec<T, R>& vec, Mat<T, C, R>&& mat) {
+    // Vec<R> * Mat<R, C> = Mat<1, R> * Mat<R, C> = Mat<1, C> = Vec<C>
+    Vec<T, C> result = Vec<T, C>::Zero();
+
+    for (size_t r = 0; r < R; ++r) {
+        result += mat.columns[r] * vec[r];
+    }
+
+    return result;
+}
+
+template <types::Scalar T, size_t C, size_t R>
+constexpr Vec<T, C> operator*(Vec<T, R>&& vec, Mat<T, C, R>&& mat) {
+    // Vec<R> * Mat<R, C> = Mat<1, R> * Mat<R, C> = Mat<1, C> = Vec<C>
+    Vec<T, C> result = Vec<T, C>::Zero();
+
+    for (size_t r = 0; r < R; ++r) {
+        result += mat.columns[r] * vec[r];
+    }
+
+    return result;
+}
+
+// Linear algebra functions:
 template <types::Scalar T, size_t N>
 constexpr T trace(const Mat<T, N, N>& mat) {
     T sum = T(0);
@@ -105,6 +242,45 @@ constexpr T determinant(const Mat<T, 3, 3>& mat) {
            mat(0, 2) * mat(1, 1) * mat(2, 0) -
            mat(0, 1) * mat(1, 0) * mat(2, 2) -
            mat(0, 0) * mat(1, 2) * mat(2, 1);
+}
+
+template <types::Scalar T, size_t N>
+constexpr T determinant(const Mat<T, N, N>& mat) {
+    if constexpr (N == 1) {
+        return mat(0, 0);
+    } else {
+        T det = T(0);
+        for (size_t j = 0; j < N; ++j) {
+            det += mat(0, j) * cofactor(mat, 0, j);
+        }
+        return det;
+    }
+}
+
+template <types::Scalar T, size_t N>
+constexpr bool is_symmetric(const Mat<T, N, N>& mat) {
+    for (size_t i = 0; i < N; ++i) {
+        for (size_t j = i + 1; j < N; ++j) {
+            if (mat(i, j) != mat(j, i)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Special matrices:
+namespace make {
+
+template <types::Scalar T, size_t C, size_t R>
+constexpr Mat<T, R, C> transpose(const Mat<T, C, R>& mat) {
+    Mat<T, R, C> result;
+    for (size_t r = 0; r < R; ++r) {
+        for (size_t c = 0; c < C; ++c) {
+            result(c, r) = mat(r, c);
+        }
+    }
+    return result;
 }
 
 template <types::Scalar T, size_t N>
@@ -137,19 +313,6 @@ constexpr T cofactor(const Mat<T, N, N>& mat, size_t row, size_t col) {
 }
 
 template <types::Scalar T, size_t N>
-constexpr T determinant(const Mat<T, N, N>& mat) {
-    if constexpr (N == 1) {
-        return mat(0, 0);
-    } else {
-        T det = T(0);
-        for (size_t j = 0; j < N; ++j) {
-            det += mat(0, j) * cofactor(mat, 0, j);
-        }
-        return det;
-    }
-}
-
-template <types::Scalar T, size_t N>
 constexpr Mat<T, N, N> inverse(const Mat<T, N, N>& mat) {
     constexpr T tolerance = static_cast<T>(1e-10);
 
@@ -179,9 +342,9 @@ constexpr Mat<T, 4, 4> translation(const Vec<T, 3>& v) {
 
 template <types::Scalar T>
 constexpr Mat<T, 4, 4> look_at(const Vec<T, 3>& eye, const Vec<T, 3>& target, const Vec<T, 3>& up) {
-    auto z = normalize(eye - target); // Forward
-    auto x = normalize(cross(up, z)); // Right
-    auto y = cross(z, x);             // Up
+    auto z = ema::normalize(eye - target);              // Forward
+    auto x = ema::normalize(ema::cross_product(up, z)); // Right
+    auto y = ema::cross_product(z, x);                  // Up
 
     Mat<T, 4, 4> res = Mat<T, 4, 4>::Identity();
     res(0, 0) = x.x();
@@ -201,8 +364,8 @@ constexpr Mat<T, 4, 4> look_at(const Vec<T, 3>& eye, const Vec<T, 3>& target, co
 }
 
 template <types::Scalar T>
-constexpr Mat<T, 4, 4> perspective(T fov_rad, T aspect, T near, T far) {
-    T tan_half_fov = std::tan(fov_rad / T(2));
+constexpr Mat<T, 4, 4> perspective(const Angle<T>& fov, T aspect, T near, T far) {
+    T tan_half_fov = std::tan(fov.as_rad() / T(2));
     Mat<T, 4, 4> res = Mat<T, 4, 4>::Zero();
     res(0, 0) = T(1) / (aspect * tan_half_fov);
     res(1, 1) = T(1) / tan_half_fov;
@@ -224,56 +387,73 @@ constexpr Mat<T, 4, 4> ortho(T left, T right, T bottom, T top, T near, T far) {
     return res;
 }
 
-// Special matrices:
 template <types::Scalar T>
-constexpr Mat<T, 2, 2> rotation_matrix_2d(T angle_rad) {
-    T c = std::cos(angle_rad);
-    T s = std::sin(angle_rad);
+constexpr Mat<T, 2, 2> rotation_matrix_2d(Angle<T> angle) {
+    T c = std::cos(angle.as_rad());
+    T s = std::sin(angle.as_rad());
 
     return Mat<T, 2, 2>{
-        Vec<T, 2>{c, -s},
-        Vec<T, 2>{s, c}};
+        Vec<T, 2>{c, s},
+        Vec<T, 2>{-s, c}};
 }
 
 template <types::Scalar T>
-constexpr Mat<T, 3, 3> rotation_matrix_x(T angle_rad) {
-    T c = std::cos(angle_rad);
-    T s = std::sin(angle_rad);
+constexpr Mat<T, 3, 3> rotation_matrix_x(Angle<T> angle) {
+    T c = std::cos(angle.as_rad());
+    T s = std::sin(angle.as_rad());
 
     return Mat<T, 3, 3>{
         Vec<T, 3>{1, 0, 0},
-        Vec<T, 3>{0, c, -s},
-        Vec<T, 3>{0, s, c}};
+        Vec<T, 3>{0, c, s},
+        Vec<T, 3>{0, -s, c}};
 }
 
 template <types::Scalar T>
-constexpr Mat<T, 3, 3> rotation_matrix_y(T angle_rad) {
-    T c = std::cos(angle_rad);
-    T s = std::sin(angle_rad);
+constexpr Mat<T, 3, 3> rotation_matrix_y(Angle<T> angle) {
+    T c = std::cos(angle.as_rad());
+    T s = std::sin(angle.as_rad());
 
     return Mat<T, 3, 3>{
-        Vec<T, 3>{c, 0, s},
+        Vec<T, 3>{c, 0, -s},
         Vec<T, 3>{0, 1, 0},
-        Vec<T, 3>{-s, 0, c}};
+        Vec<T, 3>{s, 0, c}};
 }
 
 template <types::Scalar T>
-constexpr Mat<T, 3, 3> rotation_matrix_z(T angle_rad) {
-    T c = std::cos(angle_rad);
-    T s = std::sin(angle_rad);
+constexpr Mat<T, 3, 3> rotation_matrix_z(Angle<T> angle) {
+    T c = std::cos(angle.as_rad());
+    T s = std::sin(angle.as_rad());
 
     return Mat<T, 3, 3>{
-        Vec<T, 3>{c, -s, 0},
-        Vec<T, 3>{s, c, 0},
+        Vec<T, 3>{c, s, 0},
+        Vec<T, 3>{-s, c, 0},
         Vec<T, 3>{0, 0, 1}};
 }
 
 template <types::Scalar T>
-constexpr Mat<T, 3, 3> scaling_matrix_3d(T sx, T sy, T sz) {
+constexpr Mat<T, 3, 3> rotation_matrix(Angle<T> angle, const Vec<T, 3>& axis) {
+    Vec<T, 3> norm_axis = normalize(axis);
+    T c = std::cos(angle.as_rad());
+    T s = std::sin(angle.as_rad());
+    T omc = T(1) - c;
+
+    T x = norm_axis.x();
+    T y = norm_axis.y();
+    T z = norm_axis.z();
+
     return Mat<T, 3, 3>{
-        Vec<T, 3>{sx, 0, 0},
-        Vec<T, 3>{0, sy, 0},
-        Vec<T, 3>{0, 0, sz}};
+        Vec<T, 3>{c + x * x * omc, y * x * omc + z * s, z * x * omc - y * s},
+        Vec<T, 3>{x * y * omc - z * s, c + y * y * omc, z * y * omc + x * s},
+        Vec<T, 3>{x * z * omc + y * s, y * z * omc - x * s, c + z * z * omc}};
+}
+
+template <types::Scalar T>
+constexpr Mat<T, 3, 3> scaling_matrix_3d(T sx, T sy, T sz) {
+    Mat<T, 3, 3> result;
+    result(0, 0) = sx;
+    result(1, 1) = sy;
+    result(2, 2) = sz;
+    return result;
 }
 
 template <types::Scalar T>
@@ -281,28 +461,6 @@ constexpr Mat<T, 3, 3> scaling_matrix_3d(T scale) {
     return scaling_matrix_3d(scale, scale, scale);
 }
 
-// Utility functions:
-template <types::Scalar T, size_t N>
-constexpr bool is_symmetric(const Mat<T, N, N>& mat) {
-    for (size_t i = 0; i < N; ++i) {
-        for (size_t j = i + 1; j < N; ++j) {
-            if (mat(i, j) != mat(j, i)) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-// Equality comparator operators:
-template <types::Scalar T, size_t C, size_t R>
-constexpr bool operator==(const Mat<T, C, R>& a, const Mat<T, C, R>& b) {
-    return are_equal(a, b, T(0));
-}
-
-template <types::Scalar T, size_t C, size_t R>
-constexpr bool operator!=(const Mat<T, C, R>& a, const Mat<T, C, R>& b) {
-    return !(a == b);
-}
+} // namespace make
 
 } // namespace ema

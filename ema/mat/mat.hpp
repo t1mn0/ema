@@ -25,6 +25,10 @@ class Mat {
         }
     }
 
+    template <typename... VecArgs>
+    requires(sizeof...(VecArgs) == C) && (std::is_same_v<VecArgs, Vec<T, R>> && ...)
+    constexpr Mat(VecArgs&&... cols) : columns{cols...} {}
+
     // Multiplication Identity Matrix:
     constexpr static Mat Identity() requires(C == R) {
         Mat result;
@@ -32,10 +36,6 @@ class Mat {
             result.columns[i][i] = T(1);
         }
         return result;
-    }
-
-    static constexpr Mat Unit() requires(C == R) {
-        return Mat{1};
     }
 
     static constexpr Mat Zero() {
@@ -51,6 +51,8 @@ class Mat {
     }
 
     constexpr bool is_square() const { return C == R; }
+    constexpr size_t col_num() const { return C; }
+    constexpr size_t row_num() const { return R; }
 
     // clang-format off
     constexpr       Vec<T, R>* begin()       noexcept { return columns; }
@@ -104,8 +106,14 @@ class Mat {
     constexpr Mat<T, Q, R> operator*(const Mat<T, Q, C>& oth) const {
         // Mat<R, C> * Mat<C, Q> = Mat<R, Q>
         Mat<T, Q, R> result;
-        for (size_t i = 0; i < Q; ++i) {
-            result.columns[i] = (*this) * oth.columns[i];
+        for (size_t j = 0; j < Q; ++j) {
+            Vec<T, R> res_col = columns[0] * oth(0, j);
+
+            for (size_t i = 1; i < C; ++i) {
+                res_col += columns[i] * oth(i, j);
+            }
+
+            result.col(j) = res_col;
         }
         return result;
     }
