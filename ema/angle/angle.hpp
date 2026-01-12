@@ -8,7 +8,7 @@
 namespace ema {
 
 // User can increase the accuracy of calculating angles if necessary:
-template <types::Scalar T = float>
+template <std::floating_point T = float>
 class Angle {
   public:
     T rad_val;
