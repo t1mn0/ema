@@ -141,32 +141,55 @@ class alignas(sizeof(T) * (N == 3 ? 4 : N)) Vec {
 
 // Free binary arithmetic operators:
 template <types::Scalar T, size_t N>
-constexpr Vec<T, N> operator+(Vec<T, N> lhs, const Vec<T, N>& rhs) {
-    lhs += rhs;
-    return lhs;
+constexpr Vec<T, N> operator+(const Vec<T, N>& lhs, const Vec<T, N>& rhs) {
+    Vec<T, N> result = lhs;
+    result += rhs;
+    return result;
 }
 
 template <types::Scalar T, size_t N>
-constexpr Vec<T, N> operator-(Vec<T, N> lhs, const Vec<T, N>& rhs) {
-    lhs -= rhs;
-    return lhs;
+constexpr Vec<T, N> operator-(const Vec<T, N>& lhs, const Vec<T, N>& rhs) {
+    Vec<T, N> result = lhs;
+    result -= rhs;
+    return result;
 }
 
 template <types::Scalar T, size_t N>
-constexpr Vec<T, N> operator*(Vec<T, N> vec, T scalar) {
-    vec *= scalar;
-    return vec;
+constexpr Vec<T, N> operator*(const Vec<T, N>& vec, T scalar) {
+    Vec<T, N> result = vec;
+    result *= scalar;
+    return result;
 }
 
 template <types::Scalar T, size_t N>
-constexpr Vec<T, N> operator*(T scalar, Vec<T, N> vec) {
+constexpr Vec<T, N> operator*(Vec<T, N>&& vec, T scalar) {
+    Vec<T, N> result = vec;
+    result *= scalar;
+    return result;
+}
+
+template <types::Scalar T, size_t N>
+constexpr Vec<T, N> operator*(T scalar, const Vec<T, N>& vec) {
     return vec * scalar;
 }
 
 template <types::Scalar T, size_t N>
-constexpr Vec<T, N> operator/(Vec<T, N> vec, T scalar) {
-    vec /= scalar;
-    return vec;
+constexpr Vec<T, N> operator*(T scalar, Vec<T, N>&& vec) {
+    return vec * scalar;
+}
+
+template <types::Scalar T, size_t N>
+constexpr Vec<T, N> operator/(const Vec<T, N>& vec, T scalar) {
+    Vec<T, N> result = vec;
+    result /= scalar;
+    return result;
+}
+
+template <types::Scalar T, size_t N>
+constexpr Vec<T, N> operator/(Vec<T, N>&& vec, T scalar) {
+    Vec<T, N> result = vec;
+    result /= scalar;
+    return result;
 }
 
 // aliases:

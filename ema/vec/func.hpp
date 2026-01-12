@@ -1,8 +1,10 @@
 #pragma once
 
 #include <algorithm> // for: clamp
-#include <cmath>     // for: sqrt, abs
+#include <cassert>
+#include <cmath> // for: sqrt, abs, acos
 
+#include "ema/angle/angle.hpp"
 #include "vec.hpp"
 
 namespace ema {
@@ -13,13 +15,14 @@ constexpr T is_zero(const Vec<T, N>& vec) {
 }
 
 template <types::Scalar T, size_t N>
-constexpr T len(const Vec<T, N>& vec) {
-    // type(sum): if (T == float) => float; else double;
-    std::conditional<std::is_same_v<T, float>, float, double> sum = 0.0;
+constexpr std::conditional_t<std::is_same_v<T, double>, double, float> len(const Vec<T, N>& vec) {
+    // type(sum): if (T == double) => double; else float;
+    using SumType = std::conditional_t<std::is_same_v<T, double>, double, float>;
+    SumType sum = 0.0;
     for (size_t i = 0; i < N; ++i) {
         sum += vec[i] * vec[i];
     }
-    return static_cast<T>(std::sqrt(sum));
+    return std::sqrt(sum);
 }
 
 template <types::Scalar T, size_t N>
@@ -34,11 +37,11 @@ constexpr T len_squared(const Vec<T, N>& vec) {
 template <types::Scalar T, size_t N>
 constexpr Vec<T, N> normalize(const Vec<T, N>& vec) {
     auto l = len(vec);
-    assert(l != 0, "Length of the vector for normalization must be not zero");
+    assert(l != 0.0 && "Length of the vector for normalization must be not zero");
 
     Vec<T, N> norm;
     for (size_t i = 0; i < N; ++i) {
-        norm[i] = vec[i] * (T(1) / len);
+        norm[i] = vec[i] / l;
     }
     return norm;
 }
@@ -124,18 +127,18 @@ constexpr auto abs(const Vec<T, N>& vec) {
 }
 
 template <types::Scalar T, size_t N>
-constexpr auto angle(const Vec<T, N>& a, const Vec<T, N>& b) {
+constexpr Angle<T> angle(const Vec<T, N>& a, const Vec<T, N>& b) {
     auto dot_product = dot(a, b);
     auto len_a = len(a);
     auto len_b = len(b);
 
     if (len_a == T(0) || len_b == T(0))
-        return T(0);
+        return Angle<T>::rad(T(0));
 
     auto cos_angle = dot_product / (len_a * len_b);
     cos_angle = std::clamp(cos_angle, T(-1), T(1));
 
-    return std::acos(cos_angle);
+    return Angle<T>::rad(static_cast<T>(std::acos(cos_angle)));
 }
 
 template <types::Scalar T, size_t N>
